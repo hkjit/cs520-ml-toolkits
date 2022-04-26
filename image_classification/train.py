@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 from tqdm import tqdm
+import wandb
 
 def train(model, optimizer, train_loader, val_loader, args):
     use_cuda = False
@@ -19,9 +20,12 @@ def train(model, optimizer, train_loader, val_loader, args):
             for images, labels in train_loader:
                 if use_cuda and torch.cuda.is_available():
                     images, labels = images.cuda(), labels.cuda()
+                pbar.update()
                 optimizer.zero_grad()
                 output = model(images)
                 loss = model.criterion(output, labels)
+                if args.use_wandb:
+                    wandb.log({"train loss": loss})
                 loss.backward()
                 optimizer.step()
                 train_loss += loss.item()
@@ -29,12 +33,17 @@ def train(model, optimizer, train_loader, val_loader, args):
         VALIDATION PHASE
         """
         model.eval()
-        for images, labels in val_loader:
-            if use_cuda and torch.cuda.is_available():
-                images, labels = images.cuda(), labels.cuda()
-            output = model(images)
-            loss = model.criterion(output, labels)
-            valid_loss += loss.item()
+        with tqdm(desc='Validating', total=len(val_loader)) as pbar:
+            for images, labels in val_loader:
+                if use_cuda and torch.cuda.is_available():
+                    images, labels = images.cuda(), labels.cuda()
+                pbar.update()
+                output = model(images)
+                loss = model.criterion(output, labels)
+                if args.use_wandb:
+                    wandb.log({"val loss": loss})
+                valid_loss += loss.item()
+        
 
         train_loss = train_loss/len(train_loader)
         valid_loss = valid_loss/len(val_loader)
