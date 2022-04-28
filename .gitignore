@@ -131,3 +131,4 @@ dmypy.json
 # Ignore dataset files. don't push to github
 sentiment-analysis/data/database.sqlite
 sentiment-analysis/data/Tweets.csv
+sentiment-analysis/data/preprocess_tweets.csv
