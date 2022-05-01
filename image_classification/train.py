@@ -29,6 +29,10 @@ def train(model, optimizer, train_loader, val_loader, args):
                 loss.backward()
                 optimizer.step()
                 train_loss += loss.item()
+
+        if args.use_wandb:
+            wandb.log({"training loss": train_loss, "epoch": epoch})
+
         """
         VALIDATION PHASE
         """
@@ -43,7 +47,9 @@ def train(model, optimizer, train_loader, val_loader, args):
                 if args.use_wandb:
                     wandb.log({"val loss": loss})
                 valid_loss += loss.item()
-        
+
+        if args.use_wandb:
+            wandb.log({"validation loss": valid_loss, "epoch": epoch})
 
         train_loss = train_loss/len(train_loader)
         valid_loss = valid_loss/len(val_loader)

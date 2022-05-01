@@ -11,7 +11,7 @@ def main(args):
     train_loader, val_loader, test_loader = getdataloader(args)
     if args.use_wandb:
         print("using wandb")
-        wandb.init(project="MNIST", entity="520-helloworld")
+        wandb.init(project="MNIST", entity="520-helloworld", name="MNIST digit recognition")
         wandb.config = {
             "learning_rate": args.lr,
             "epochs": args.epochs,
