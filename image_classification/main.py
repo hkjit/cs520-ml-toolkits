@@ -4,6 +4,7 @@ from train import train
 from model import Model
 from dataloader import getdataloader
 import wandb
+from comet_ml import Experiment
 
 def main(args):
     model = Model()
@@ -17,6 +18,7 @@ def main(args):
             "epochs": args.epochs,
             "batch_size": args.batch_size
         }
+
     train(model, optimizer, train_loader, val_loader, args)
     
 
@@ -24,6 +26,7 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--cuda', help='Use cuda?', action='store_true')
     parser.add_argument('--use_wandb', help='Use cuda?', action='store_true')
+    parser.add_argument('--use_comet', help='Use cuda?', action='store_true')
     parser.add_argument('--batch_size', help='Batch size', type=int, default=8)
     parser.add_argument('--epochs', help='Number of epochs to run', type=int, default=10)
     parser.add_argument('--lr', help='learning rate', type=float, default=0.001)
