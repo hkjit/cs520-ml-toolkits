@@ -2,11 +2,31 @@ import torch
 import numpy as np
 from tqdm import tqdm
 import wandb
+from comet_ml import Experiment
 
 def train(model, optimizer, train_loader, val_loader, args):
     use_cuda = False
     if use_cuda and torch.cuda.is_available():
         model.cuda()
+
+    if args.use_comet:
+        print("using comet")
+        experiment = Experiment(
+            api_key="",
+            project_name="MNIST digit recognition",
+            workspace="",
+        )
+        experiment.add_tag('pytorch')
+        experiment.log_parameters(
+            {
+                "learning_rate": args.lr,
+                "epochs": args.epochs,
+                "batch_size": args.batch_size
+            }
+        )
+
+    if args.use_comet:
+        experiment.train()
 
     for epoch in range(args.epochs):
         train_loss = 0.0
@@ -29,6 +49,12 @@ def train(model, optimizer, train_loader, val_loader, args):
                 loss.backward()
                 optimizer.step()
                 train_loss += loss.item()
+
+        if args.use_wandb:
+            wandb.log({"training loss": train_loss, "epoch": epoch})
+        elif args.use_comet:
+            experiment.log_metric("training loss", train_loss, step=epoch)
+
         """
         VALIDATION PHASE
         """
@@ -43,7 +69,11 @@ def train(model, optimizer, train_loader, val_loader, args):
                 if args.use_wandb:
                     wandb.log({"val loss": loss})
                 valid_loss += loss.item()
-        
+
+        if args.use_wandb:
+            wandb.log({"validation loss": valid_loss, "epoch": epoch})
+        elif args.use_comet:
+            experiment.log_metric("validation loss", valid_loss, step=epoch)
 
         train_loss = train_loss/len(train_loader)
         valid_loss = valid_loss/len(val_loader)
