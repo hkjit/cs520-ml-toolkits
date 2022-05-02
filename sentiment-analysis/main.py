@@ -3,7 +3,6 @@ import wandb
 from train.train import train
 from test.test import test
 
-
 def main(args):
     if args.use_wandb:
         print("using wandb")
@@ -34,4 +33,5 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint_dir',help='Checkpoint directory', default='./checkpoints')
     parser.add_argument('--train', help='Training mode?', action='store_true')
     parser.add_argument('--test', help='Testing mode?', action='store_true')
+    parser.add_argument('--use_comet', help='Use cuda?', action='store_true')
     main(parser.parse_args())

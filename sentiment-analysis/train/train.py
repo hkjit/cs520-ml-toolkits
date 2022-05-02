@@ -6,6 +6,7 @@ from torch.utils.data import TensorDataset, DataLoader
 import torch.nn as nn
 import wandb
 import sys
+from comet_ml import Experiment
 sys.path.insert(0, "./models")
 from rnn import RNN
 
@@ -46,6 +47,23 @@ def train(args):
         print('Training on GPU.')
     else:
         print('No GPU available, training on CPU.')
+
+    if args.use_comet:
+        print("using comet")
+        experiment = Experiment(
+            api_key="",
+            project_name="Twitter Airline sentiment analysis",
+            workspace="",
+        )
+        experiment.add_tag('pytorch')
+        experiment.log_parameters(
+            {
+                "learning_rate": args.lr,
+                "epochs": args.epochs,
+                "batch_size": args.batch_size
+            }
+        )
+        experiment.train()
 
     # Instantiate the model w/ hyperparams
     vocab_size = 29237  # +1 for the 0 padding + our word tokens
@@ -130,6 +148,9 @@ def train(args):
                     wandb.log({"validation loss": np.mean(val_losses)})
                     wandb.log({"epoch": e + 1})
                     wandb.log({"step": counter})
+                if args.use_comet:
+                    experiment.log_metric("training loss", loss, step=counter)
+                    experiment.log_metric("validation loss", np.mean(val_losses), step=counter)
                 print("Epoch: {}/{}...".format(e + 1, epochs),
                       "Step: {}...".format(counter),
                       "Loss: {:.6f}...".format(loss.item()),
