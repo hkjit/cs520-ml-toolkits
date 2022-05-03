@@ -12,9 +12,9 @@ def train(model, optimizer, train_loader, val_loader, args):
     if args.use_comet:
         print("using comet")
         experiment = Experiment(
-            api_key="",
+            api_key="NhCJtV4broSjyc6xXMzrvozJ8",
             project_name="MNIST digit recognition",
-            workspace="",
+            workspace="amandeepc",
         )
         experiment.add_tag('pytorch')
         experiment.log_parameters(
@@ -27,6 +27,9 @@ def train(model, optimizer, train_loader, val_loader, args):
 
     if args.use_comet:
         experiment.train()
+
+    if args.use_wandb:
+        wandb.watch(model, log="all", log_freq=10)
 
     for epoch in range(args.epochs):
         train_loss = 0.0
