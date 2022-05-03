@@ -4,8 +4,7 @@ from tqdm import tqdm
 import wandb
 from comet_ml import Experiment
 
-def train(model, optimizer, train_loader, val_loader, args):
-    use_cuda = False
+def train(model, optimizer, train_loader, val_loader, use_cuda, args):
     if use_cuda and torch.cuda.is_available():
         model.cuda()
 
