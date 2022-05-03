@@ -1,0 +1,6 @@
+torch==1.8.1
+torchvision==0.9.1
+tqdm
+wandb==0.12.15
+comet-ml==3.30.0
+numpy==1.19.5
