@@ -4,10 +4,15 @@ from tqdm import tqdm
 import wandb
 from comet_ml import Experiment
 
+
 def train(model, optimizer, train_loader, val_loader, use_cuda, args):
+    """
+    Training procedure for the Image Classification task
+    """
     if use_cuda and torch.cuda.is_available():
         model.cuda()
 
+    # Setup Comet experiment for tracking
     if args.use_comet:
         print("using comet")
         experiment = Experiment(
@@ -27,9 +32,11 @@ def train(model, optimizer, train_loader, val_loader, use_cuda, args):
     if args.use_comet:
         experiment.train()
 
+    # Instigate the watch on all params in wandb
     if args.use_wandb:
         wandb.watch(model, log="all", log_freq=10)
 
+    # Training for args.epochs epochs
     for epoch in range(args.epochs):
         train_loss = 0.0
         valid_loss = 0.0
@@ -52,6 +59,7 @@ def train(model, optimizer, train_loader, val_loader, use_cuda, args):
                 optimizer.step()
                 train_loss += loss.item()
 
+        # Log training loss to wandb and comet
         if args.use_wandb:
             wandb.log({"training loss": train_loss, "epoch": epoch})
         elif args.use_comet:
@@ -72,11 +80,11 @@ def train(model, optimizer, train_loader, val_loader, use_cuda, args):
                     wandb.log({"val loss": loss})
                 valid_loss += loss.item()
 
+        # Log validation loss to wandb and comet
         if args.use_wandb:
             wandb.log({"validation loss": valid_loss, "epoch": epoch})
         elif args.use_comet:
             experiment.log_metric("validation loss", valid_loss, step=epoch)
 
-        train_loss = train_loss/len(train_loader)
-        valid_loss = valid_loss/len(val_loader)
-
+        train_loss = train_loss / len(train_loader)
+        valid_loss = valid_loss / len(val_loader)

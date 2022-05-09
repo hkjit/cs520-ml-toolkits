@@ -7,6 +7,9 @@ import wandb
 import torch.optim as optim
 
 def build_optimizer(network, optimizer, learning_rate):
+    """
+    Returns an optimizer object for training.
+    """
     if optimizer == "sgd":
         optimizer = optim.SGD(network.parameters(),
                               lr=learning_rate, momentum=0.9)
@@ -16,6 +19,9 @@ def build_optimizer(network, optimizer, learning_rate):
     return optimizer
 
 def sweep(config = None):
+    """
+    Setup the wandb sweeping for hyper-parameters and train
+    """
     with wandb.init(config=config, project="MNIST", entity="520-helloworld", name="MNIST digit recognition"):
         config = wandb.config
         model = Model()
@@ -25,6 +31,8 @@ def sweep(config = None):
         train(model, optimizer, train_loader, val_loader, use_cuda, config)    
 
 def main(args):
+
+    # Define hyper-parameters sweep config
     if args.sweep:
         sweep_config = {
             'method': 'random'
@@ -69,9 +77,12 @@ def main(args):
         
         
     else:
+        # Define the model
         model = Model()
+        # Get an optimizeer
         optimizer = build_optimizer(model, args.optimizer, args.lr)
         train_loader, val_loader, test_loader = getdataloader(args)
+        # Setup wandb for training
         if args.use_wandb:
             print("using wandb")
             wandb.init(project="MNIST", entity="520-helloworld", name="MNIST digit recognition")
@@ -81,8 +92,10 @@ def main(args):
                 "batch_size": args.batch_size
             }
         use_cuda = False
+        # Check for CUDA
         if args.use_cuda:
             use_cuda = True
+        # Train the model with defined hyper-parameters
         train(model, optimizer, train_loader, val_loader, use_cuda, args)
     
 

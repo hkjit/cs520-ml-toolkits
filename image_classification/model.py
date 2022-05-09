@@ -5,7 +5,13 @@ import torch.nn.functional as F
 A Convolutional Neural Network for Image Classification.
 '''
 class Model(nn.Module):
+    """
+    Define the model architecture for Image Classification
+    """
     def __init__(self):
+        """
+        Initialize the model by setting up the layers.
+        """
         super(Model, self).__init__()
         self.conv1 = nn.Conv2d(in_channels = 1, out_channels = 16, kernel_size = 5)
         self.conv2 = nn.Conv2d(in_channels = 16, out_channels = 32, kernel_size = 5)
@@ -17,6 +23,9 @@ class Model(nn.Module):
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x):
+        """
+        Perform a forward pass of our model on some input and hidden state.
+        """
         x = self.max_pool(F.relu(self.conv1(x)))
         x = self.max_pool(F.relu(self.conv2(x)))
         x = x.view(-1, 32*4*4)

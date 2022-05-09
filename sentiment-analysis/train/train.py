@@ -48,6 +48,7 @@ def train(args):
     else:
         print('No GPU available, training on CPU.')
 
+    # Adding comet experiment
     if args.use_comet:
         print("using comet")
         experiment = Experiment(
@@ -143,11 +144,13 @@ def train(args):
                     val_losses.append(val_loss.item())
 
                 model.train()
+                # Logging parameters to Wandb
                 if args.use_wandb:
                     wandb.log({"train loss": loss})
                     wandb.log({"validation loss": np.mean(val_losses)})
                     wandb.log({"epoch": e + 1})
                     wandb.log({"step": counter})
+                # Logging parameters to comet
                 if args.use_comet:
                     experiment.log_metric("training loss", loss, step=counter)
                     experiment.log_metric("validation loss", np.mean(val_losses), step=counter)
@@ -155,6 +158,7 @@ def train(args):
                       "Step: {}...".format(counter),
                       "Loss: {:.6f}...".format(loss.item()),
                       "Val Loss: {:.6f}".format(np.mean(val_losses)))
+        # Best Practice: Save checkpoints after every checkpoint_freq
         if (e + 1) % checkpoint_freq == 0:
             print("Saving the checkpoint..")
             torch.save(model, f'{args.checkpoint_dir}/model.pt')

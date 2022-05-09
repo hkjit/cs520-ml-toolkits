@@ -56,6 +56,7 @@ for label in labels:
 
 encoded_labels = np.asarray(encoded_labels)
 
+# Dataset parameters
 split_ratio = 0.8
 seq_length = 30
 batch_size = 50
