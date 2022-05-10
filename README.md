@@ -37,3 +37,5 @@ The two tasks are
     --use_wandb
     ````
    3. To log the experiment tracking in comet use the flag ``--use_comet`` when running the above command.
+   4. In addition to this task, we wanted to check the use of these tools with large language models like BERT. For this, we have
+   used movie reviews dataset. This additional task can be found in ``Movie-review-sentiment-analysis`` folder.
